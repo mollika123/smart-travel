@@ -269,7 +269,73 @@ export default function Home() {
           ))}
         </div>
       </section>
+      {/* popular destination  */}
+{/* Popular Destinations Section */}
+<section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-24">
+  <div className="text-center max-w-2xl mx-auto mb-12">
+    <h2 className="text-3xl sm:text-4xl font-extrabold tracking-tight">
+      Popular Destinations
+    </h2>
+    <p className="text-zinc-500 dark:text-zinc-400 mt-4">
+      Discover trending places and let AI create your perfect travel plan.
+    </p>
+  </div>
 
+  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+    {[
+      {
+        name: "Paris",
+        country: "France 🇫🇷",
+        description: "Romantic city with art, culture and iconic landmarks."
+      },
+      {
+        name: "Tokyo",
+        country: "Japan 🇯🇵",
+        description: "Experience technology, food and traditional culture."
+      },
+      {
+        name: "Bali",
+        country: "Indonesia 🇮🇩",
+        description: "Beautiful beaches, nature and relaxing adventures."
+      },
+      {
+        name: "Rome",
+        country: "Italy 🇮🇹",
+        description: "Explore ancient history and amazing architecture."
+      }
+    ].map((place) => (
+      <div
+        key={place.name}
+        className="group p-6 rounded-2xl bg-white dark:bg-zinc-900 border border-zinc-200/80 dark:border-zinc-800 hover:shadow-xl hover:-translate-y-2 transition-all duration-300"
+      >
+        <div className="w-12 h-12 rounded-xl bg-teal-500/10 flex items-center justify-center text-2xl mb-5">
+          🌍
+        </div>
+
+        <h3 className="text-xl font-bold">
+          {place.name}
+        </h3>
+
+        <p className="text-sm text-teal-600 dark:text-teal-400 font-medium mt-1">
+          {place.country}
+        </p>
+
+        <p className="text-sm text-zinc-500 dark:text-zinc-400 mt-3 leading-relaxed">
+          {place.description}
+        </p>
+
+        <button
+          className="mt-5 text-sm font-semibold text-teal-600 hover:text-teal-500"
+          onClick={() => {
+            window.location.href = `/dashboard?destination=${place.name}`;
+          }}
+        >
+          Plan Trip →
+        </button>
+      </div>
+    ))}
+  </div>
+</section>
       {/* Call to Action Section */}
       <section className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 pb-32">
         <div className="relative rounded-3xl bg-gradient-to-br from-teal-900 via-zinc-900 to-zinc-950 text-white p-8 sm:p-16 overflow-hidden border border-teal-800/50 shadow-2xl">
