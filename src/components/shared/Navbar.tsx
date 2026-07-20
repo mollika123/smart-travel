@@ -23,13 +23,20 @@ export default function Navbar() {
     window.addEventListener('scroll', handleScroll);
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
-
-  const navLinks = [
-    { name: 'Explore', href: '/explore' },
-    { name: 'Dashboard', href: '/dashboard' },
-    { name: 'AI Chat', href: '/chat' },
-    { name: 'About', href: '/about' },
-  ];
+const navLinks = user
+  ? [
+      { name: 'Explore', href: '/explore' },
+      { name: 'Dashboard', href: '/dashboard' },
+      { name: 'Add Trip', href: '/items/add' },
+      { name: 'Manage Trips', href: '/items/manage' },
+      { name: 'AI Chat', href: '/chat' },
+      { name: 'About', href: '/about' },
+    ]
+  : [
+      { name: 'Explore', href: '/explore' },
+      { name: 'About', href: '/about' },
+      { name: 'AI Chat', href: '/chat' },
+    ];
 
   return (
     <nav className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${

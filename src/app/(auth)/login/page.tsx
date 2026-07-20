@@ -13,30 +13,46 @@ export default function LoginPage() {
   const router = useRouter();
   const { login } = useAuth();
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setIsLoading(true);
-    setError('');
+const handleSubmit = async (e: React.FormEvent) => {
+  e.preventDefault();
+  setIsLoading(true);
+  setError('');
 
-    try {
-      // Simulate API login call
-      await new Promise((resolve) => setTimeout(resolve, 1000));
-      
-      const name = email.split('@')[0];
-      const formattedName = name.charAt(0).toUpperCase() + name.slice(1);
-      
-      login(email, 'mock-jwt-token-string', {
-        id: 'user_' + Math.random().toString(36).substring(2, 9),
-        name: formattedName
-      });
-      
-      router.push('/dashboard');
-    } catch (err: any) {
-      setError(err.message || 'Login failed. Please check credentials.');
-    } finally {
-      setIsLoading(false);
+  try {
+    const res = await fetch(
+      `${process.env.NEXT_PUBLIC_API_URL}/api/auth/login`,
+      {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          email,
+          password,
+        }),
+      }
+    );
+
+    const data = await res.json();
+
+    if (!res.ok) {
+      throw new Error(data.message || 'Login failed');
     }
-  };
+
+    login(data.user.email, data.token, data.user);
+
+    router.push('/dashboard');
+
+  } catch (err: unknown) {
+    if (err instanceof Error) {
+      setError(err.message);
+    } else {
+      setError('Login failed. Please check credentials.');
+    }
+  } finally {
+    setIsLoading(false);
+  }
+};
 
   return (
     <div className="flex-grow flex items-center justify-center py-20 px-4 sm:px-6 lg:px-8 relative overflow-hidden">
@@ -120,6 +136,16 @@ export default function LoginPage() {
             >
               {isLoading ? 'Signing in...' : 'Sign In'}
             </button>
+            <button
+  type="button"
+  onClick={() => {
+    setEmail("demo@smarttravel.com");
+    setPassword("123456");
+  }}
+  className="w-full py-3 rounded-xl border mt-3 border-teal-500 text-teal-600 font-bold"
+>
+  Demo Login
+</button>
           </div>
         </form>
 

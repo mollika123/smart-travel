@@ -13,7 +13,8 @@ export interface DayPlan {
 }
 
 export interface Trip {
-  id: string;
+  _id?:string,
+  id?: string;
   title: string;
   destination: string;
   startDate: string;

@@ -31,59 +31,41 @@ export default function TripGenerator({ onTripGenerated }: TripGeneratorProps) {
     }
     return () => clearInterval(interval);
   }, [loading, loadingMessages.length]);
+const handleFormSubmit = async (formData: TripFormData) => {
+  setLoading(true);
 
-  const handleFormSubmit = async (formData: TripFormData) => {
-    setLoading(true);
+  try {
 
-    try {
-      // For now, mock a backend API request that would call Gemini
-      await new Promise((resolve) => setTimeout(resolve, 8000));
-      
-      const mockGeneratedItinerary = Array.from({ length: 3 }).map((_, idx) => ({
-        dayNumber: idx + 1,
-        activities: [
-          {
-            time: '09:00 AM',
-            title: `Morning Exploration in ${formData.destination}`,
-            description: `Visit the central historic landmarks of ${formData.destination} to learn about the heritage.`,
-            cost: 'Free'
-          },
-          {
-            time: '01:00 PM',
-            title: 'Local Delicacies Lunch',
-            description: `Try traditional dishes at a top-rated local market or family-run cafe recommended by food experts.`,
-            cost: '$15 - $30'
-          },
-          {
-            time: '04:00 PM',
-            title: 'Afternoon Scenic Walk',
-            description: 'Stroll through picturesque parks or scenic paths. Perfect for photography and relaxing.',
-            cost: 'Free'
-          }
-        ]
-      }));
+    const res = await fetch(
+      `${process.env.NEXT_PUBLIC_API_URL}/api/trips`,
+      {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${localStorage.getItem("token")}`,
+        },
+        body: JSON.stringify(formData),
+      }
+    );
 
-      const newTrip = {
-        id: Math.random().toString(36).substring(2, 9),
-        title: `Adventure in ${formData.destination}`,
-        destination: formData.destination,
-        startDate: formData.startDate,
-        endDate: formData.endDate,
-        budget: formData.budget,
-        travelStyle: formData.travelStyle,
-        itinerary: mockGeneratedItinerary,
-        status: 'upcoming' as const,
-        createdBy: 'user_1',
-        createdAt: new Date().toISOString()
-      };
+    const data = await res.json();
 
-      onTripGenerated(newTrip);
-    } catch (err) {
-      console.error('Error generating trip:', err);
-    } finally {
-      setLoading(false);
+    if (!res.ok) {
+      throw new Error(data.message || "Trip creation failed");
     }
-  };
+
+    onTripGenerated(data);
+
+  } catch (err) {
+
+    console.error("Error creating trip:", err);
+
+  } finally {
+
+    setLoading(false);
+
+  }
+};
 
   return (
     <div className="w-full max-w-3xl mx-auto">

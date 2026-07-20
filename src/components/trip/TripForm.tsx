@@ -1,27 +1,49 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 
 export interface TripFormData {
   destination: string;
   startDate: string;
+  imageUrl?: string;
   endDate: string;
   budget: 'budget' | 'moderate' | 'luxury';
   travelStyle: 'adventure' | 'relaxation' | 'culture' | 'family' | 'romantic' | 'nature';
 }
 
 interface TripFormProps {
-  initialDestination?: string;
-  onSubmit: (data: TripFormData) => void;
+  initialData?: TripFormData; // 🔄 পরিবর্তন: initialDestination বদলে পুরো অবজেক্ট
+  onSubmit: (data: TripFormData) => Promise<void> | void; // 🔄 পরিবর্তন: async/sync দুইটাই নিবে
   isLoading?: boolean;
+  buttonText?: string; // 🔄 পরিবর্তন: কাস্টম বাটন টেক্সট
 }
 
-export default function TripForm({ initialDestination = '', onSubmit, isLoading = false }: TripFormProps) {
-  const [destination, setDestination] = useState(initialDestination);
-  const [startDate, setStartDate] = useState('');
-  const [endDate, setEndDate] = useState('');
-  const [budget, setBudget] = useState<'budget' | 'moderate' | 'luxury'>('moderate');
-  const [travelStyle, setTravelStyle] = useState<'adventure' | 'relaxation' | 'culture' | 'family' | 'romantic' | 'nature'>('relaxation');
+export default function TripForm({ 
+  initialData, 
+  onSubmit, 
+  isLoading = false,
+  buttonText = 'Generate Custom Trip Itinerary' // 🔄 পরিবর্তন: ডিফল্ট ভ্যালু
+}: TripFormProps) {
+  
+  // 🔄 পরিবর্তন: initialData থাকলে সেটা দিয়ে স্টেট শুরু হবে, নয়তো ডিফল্ট ভ্যালু
+  const [destination, setDestination] = useState(initialData?.destination || '');
+  const [imageUrl, setImageUrl] = useState(initialData?.imageUrl || '');
+  const [startDate, setStartDate] = useState(initialData?.startDate || '');
+  const [endDate, setEndDate] = useState(initialData?.endDate || '');
+  const [budget, setBudget] = useState<'budget' | 'moderate' | 'luxury'>(initialData?.budget || 'moderate');
+  const [travelStyle, setTravelStyle] = useState<'adventure' | 'relaxation' | 'culture' | 'family' | 'romantic' | 'nature'>(initialData?.travelStyle || 'relaxation');
+
+  // 🔄 নতুন সংযোজন: ডাটাবেজ থেকে এডিট মোডের ডাটা লোড হলে স্টেট আপডেট করার জন্য
+  useEffect(() => {
+    if (initialData) {
+      setDestination(initialData.destination || '');
+      setImageUrl(initialData.imageUrl || '');
+      setStartDate(initialData.startDate || '');
+      setEndDate(initialData.endDate || '');
+      setBudget(initialData.budget || 'moderate');
+      setTravelStyle(initialData.travelStyle || 'relaxation');
+    }
+  }, [initialData]);
 
   const budgetOptions: { value: 'budget' | 'moderate' | 'luxury'; label: string; desc: string; icon: string }[] = [
     { value: 'budget', label: 'Budget', desc: 'Backpacker style, cost-saving focus', icon: '💵' },
@@ -45,6 +67,7 @@ export default function TripForm({ initialDestination = '', onSubmit, isLoading 
     onSubmit({
       destination: destination.trim(),
       startDate,
+      imageUrl,
       endDate,
       budget,
       travelStyle,
@@ -72,6 +95,20 @@ export default function TripForm({ initialDestination = '', onSubmit, isLoading 
             className="block w-full pl-11 pr-4 py-3.5 bg-transparent border-none text-zinc-900 dark:text-zinc-100 placeholder-zinc-400 outline-none text-base"
           />
         </div>
+      </div>
+
+      {/* Image URL Input */}
+      <div className="space-y-2">
+        <label className="block text-sm font-bold text-zinc-700 dark:text-zinc-300">
+          Image URL (optional)
+        </label>
+        <input
+          type="url"
+          value={imageUrl}
+          onChange={(e) => setImageUrl(e.target.value)}
+          placeholder="https://example.com/travel-image.jpg"
+          className="block w-full px-4 py-3.5 bg-transparent border border-zinc-200 dark:border-zinc-800 rounded-xl text-zinc-900 dark:text-zinc-100 outline-none focus:border-teal-500"
+        />
       </div>
 
       {/* Date Fields */}
@@ -153,7 +190,7 @@ export default function TripForm({ initialDestination = '', onSubmit, isLoading 
                 }`}
               >
                 <span className="text-3xl">{opt.icon}</span>
-                <span className="text-xs font-bold text-zinc-850 dark:text-zinc-200">{opt.label}</span>
+                <span className="text-xs font-bold text-zinc-800 dark:text-zinc-200">{opt.label}</span>
               </button>
             );
           })}
@@ -172,11 +209,12 @@ export default function TripForm({ initialDestination = '', onSubmit, isLoading 
               <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
               <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" />
             </svg>
-            Generating AI Itinerary...
+            Processing...
           </>
         ) : (
           <>
-            🪄 Generate Custom Trip Itinerary
+            {/* 🔄 পরিবর্তন: এখানে ডাইনামিক buttonText বসানো হয়েছে */}
+            🪄 {buttonText}
           </>
         )}
       </button>
